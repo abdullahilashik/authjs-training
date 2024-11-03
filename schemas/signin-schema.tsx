@@ -6,7 +6,7 @@ export const SignInSchema  = z.object({
         message: 'Email is required'
     }).email('Invalid email'),
     password: z.string()
-        .min(6, 'Minimum 6 characters')
+        .min(2, 'Minimum 6 characters')
         .max(32, 'Maximum 32 characters')
 })
     
