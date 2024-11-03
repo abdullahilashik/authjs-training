@@ -11,12 +11,11 @@ export const {auth, signIn, signOut, handlers} = NextAuth({
                 email: {name: 'email', placeholder: 'Your email', label: 'Email', type: 'email', required: true},
                 password: {name: 'password', placeholder: '******', label: 'Password', type: 'password', required: true}
             },
-            async authorize(credentials) {
-                let user=  null;                
+            authorize: async (credentials) => {
+                let user=  null;
                 const parsedCredentials = SignInSchema.safeParse(credentials);
                 if(!parsedCredentials.success){
-                    // failed to get the safely pared inputs
-                    console.log('Parsed: ', parsedCredentials);
+                    // failed to get the safely pared inputs                    
                     return null;
                 }                
                 user = {
