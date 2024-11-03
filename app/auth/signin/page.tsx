@@ -1,9 +1,7 @@
 "use client";
 
 import AuthCardFooter from '@/components/auth/card-footer'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
-import Link from 'next/link'
 import React, { useState } from 'react'
 import {
   Form,
