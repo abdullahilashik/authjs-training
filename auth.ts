@@ -1,60 +1,65 @@
-import { AuthOptions, CredentialsConfig } from 'next-auth/providers/credentials';
-import { NextAuthOptions } from 'next-auth';
+import NextAuth from 'next-auth';
+import Credentials from 'next-auth/providers/credentials';
+import Github from 'next-auth/providers/github';
+import { SignInSchema } from './schemas/signin-schema';
 
 interface User {
-  id: string;
-  name: string;
-  email: string;
-  // Add other fields as necessary
+    id: string;
+    name: string;
+    email: string;
 }
 
-// Define the type of your credentials
-interface Credentials {
-  username: string;
-  password: string;
-}
-
-export const authOptions: NextAuthOptions = {
-  providers: [
-    CredentialsConfig<Credentials>({
-      // Type the credentials and specify required fields for TypeScript safety
-      name: 'Credentials',
-      credentials: {
-        username: { label: 'Username', type: 'text' },
-        password: { label: 'Password', type: 'password' },
-      },
-      authorize: async (credentials: Credentials | undefined) => {
-        if (!credentials) {
-          return null;
+export const {auth, signIn, signOut, handlers} = NextAuth({
+    providers: [     
+        Github,   
+        Credentials({            
+            credentials: {
+                email: {name: 'email', placeholder: 'Your email', label: 'Email', type: 'email', required: true},
+                password: {name: 'password', placeholder: '******', label: 'Password', type: 'password', required: true}
+            },
+            async authorize (credentials) : Promise<any>{
+                let user =  null;
+                const parsedCredentials = SignInSchema.safeParse(credentials);
+                if(!parsedCredentials.success){
+                    // failed to get the safely pared inputs                    
+                    return null;
+                };
+                user = {
+                    id: 1,
+                    name: 'ashik',
+                    email: 'ashik@gmail.com'
+                };                
+                return user;
+            }            
+        }),        
+    ],
+    callbacks: {
+        authorized({request: {nextUrl}, auth}){
+            const isLoggedIn = !!auth?.user;
+            const {pathname} = nextUrl;
+            
+            if(!isLoggedIn && !pathname.startsWith('/auth/signin')){
+                return Response.redirect(new URL('/auth/signin', nextUrl));
+            }
+            if(isLoggedIn && pathname.startsWith('/auth/signin')){
+                return Response.redirect(new URL('/', nextUrl));
+            }
+            return !!auth;
+        },
+        jwt({token, user}){
+            if(user){
+                token.id = user.id as string;
+            }
+            return token;
+        },
+        session({session, token}){
+            // if(session){
+            //     session.user.id = token.id;
+            // }
+            return session;
         }
-
-        const { username, password } = credentials;
-
-        // Replace this with your actual authentication logic
-        const user = await authenticateUser(username, password);
-
-        if (user) {
-          // Return a User object if authentication is successful
-          return { id: user.id, name: user.name, email: user.email };
-        } else {
-          // Return null if authentication fails
-          return null;
-        }
-      },
-    }),
-  ],
-  // Additional NextAuth options if needed
-};
-
-// Mock function to simulate an authentication check
-async function authenticateUser(username: string, password: string): Promise<User | null> {
-  // Replace this with your authentication logic, such as querying a database
-  if (username === 'test' && password === 'password') {
-    return {
-      id: '1',
-      name: 'Test User',
-      email: 'test@example.com',
-    };
-  }
-  return null;
-}
+    },
+    pages: {
+        signIn: '/auth/signin'
+    }
+})
