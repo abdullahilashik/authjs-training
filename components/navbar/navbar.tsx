@@ -28,26 +28,30 @@ const Navbar = async () => {
           </div>
           {/* action buttons */}
           <ul className="flex items-center gap-4">
-            <Link href={'/'} className='pr-4 border-r-2 text-xl font-bold border-black'>Leaders Panel</Link>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Bell />
-              </PopoverTrigger>
-              <PopoverContent>
-
-              </PopoverContent>
-            </Popover>
+            <Link href={'/'} className='pr-4 border-r-2 text-xl font-bold border-black'>Leaders Panel</Link>            
             {
               !session && (
-              <Link href={'/auth/signin'} className={buttonVariants({variant: 'default'})}>
-                <LogOut />
-                <span>Login</span>
-              </Link>
+                <>                  
+                  <Link href={'/auth/signin'} className={buttonVariants({variant: 'default'})}>
+                    <LogOut />
+                    <span>Login</span>
+                  </Link>                                
+                </>
               )
             }            
             
             {
               session && (
+                <>
+                <Popover>
+                    <PopoverTrigger asChild>
+                      <Bell />
+                    </PopoverTrigger>
+                    <PopoverContent>
+
+                    </PopoverContent>
+                  </Popover>
+                  
                 <Popover>
                   <PopoverTrigger asChild>
                     <Avatar>
@@ -61,6 +65,7 @@ const Navbar = async () => {
                     </ul>
                   </PopoverContent>
                 </Popover>
+                </>
               )
             }
             {session && <AuthLogoutButton />}
