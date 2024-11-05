@@ -8,7 +8,7 @@ interface PageProps {
 
 const AuthButton = ({title, pending} : PageProps) => {
   return (
-    <Button type='submit' disabled={pending}>{pending ? 'Please wait...' : title}</Button>
+    <Button className='col-span-2 w-full mb-2' type='submit' disabled={pending}>{pending ? 'Please wait...' : title}</Button>
   )
 }
 

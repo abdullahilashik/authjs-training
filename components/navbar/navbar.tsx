@@ -14,7 +14,7 @@ const Navbar = async () => {
   const session = await auth();
   console.log('Session: ', session);
   return (
-    <section className='sticky top-0 backdrop-blur-md'>
+    <section className='sticky top-0 z-10 bg-white backdrop-blur-md'>
       <div className="container">
         <div className="flex items-center justify-between p-4">
           {/* logo */}

@@ -34,7 +34,7 @@ export default async function RootLayout({
     <SessionProvider>
       <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
       >
         <Navbar />      
         {session && <Header />  }

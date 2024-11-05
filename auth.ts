@@ -2,11 +2,19 @@ import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import Github from 'next-auth/providers/github';
 import { SignInSchema } from './schemas/signin-schema';
+import axios, { AxiosError } from 'axios';
 
 interface User {
-    id: string;
-    name: string;
-    email: string;
+    id: number | any,
+    fname: string | any,
+    lname: string | any,
+    email: string | any,
+    phone: string | any,
+    image_path: string | any,
+    email_verified_at: string | any,
+    created_at: string | any,
+    updated_at: string | any,
+    token: string | any,
 }
 
 export const {auth, signIn, signOut, handlers} = NextAuth({
@@ -21,15 +29,30 @@ export const {auth, signIn, signOut, handlers} = NextAuth({
                 let user =  null;
                 const parsedCredentials = SignInSchema.safeParse(credentials);
                 if(!parsedCredentials.success){
-                    // failed to get the safely pared inputs                    
+                    // failed to get the safely pared inputs
                     return null;
-                };
-                user = {
-                    id: 1,
-                    name: 'ashik',
-                    email: 'ashik@gmail.com'
-                };                
-                return user;
+                };                                
+
+                // auth start
+                try {
+                    console.log('Sending for login: ', parsedCredentials)
+                    const res : any = await axios.post('http://localhost:8000/api/login', parsedCredentials.data, {
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    const data = await res.data;                    
+                    if(data.errors){
+                        return null;
+                    }
+                    return data;
+                  } catch (error : any) {                    
+                    console.log('Error auth: ', error.response.data);
+                    throw new Error(error.response.data.message || 'Failed to login');
+                  }
+                // auth ends                
             }            
         }),        
     ],
@@ -38,10 +61,16 @@ export const {auth, signIn, signOut, handlers} = NextAuth({
             const isLoggedIn = !!auth?.user;
             const {pathname} = nextUrl;
             
-            if(!isLoggedIn && !pathname.startsWith('/auth/signin')){
+            
+            if(!isLoggedIn && pathname.startsWith('/auth/')){
+                return true;
+            }            
+
+            if(!isLoggedIn && !pathname.startsWith('/auth/signin') ){
                 return Response.redirect(new URL('/auth/signin', nextUrl));
             }
-            if(isLoggedIn && pathname.startsWith('/auth/signin')){
+            
+            if(isLoggedIn && (pathname.startsWith('/auth/signin') || pathname.startsWith('/auth/signup'))){
                 return Response.redirect(new URL('/', nextUrl));
             }
             return !!auth;
@@ -49,13 +78,20 @@ export const {auth, signIn, signOut, handlers} = NextAuth({
         jwt({token, user}){
             if(user){
                 token.id = user.id as string;
+                token.name = user.name || (user.fname as string + ' ' + user.lname as string);
+                token.token = user.token as string;
+                token.phone = user.phone as string;
+                token.image = user.image || user.image_path as string || null;
             }
             return token;
         },
         session({session, token}){
-            // if(session){
-            //     session.user.id = token.id;
-            // }
+            if(session){
+                session.user.token = token.token;
+                session.user.phone = token.phone;
+                session.user.image = token.image;
+                session.user.id = token.id;
+            }
             return session;
         }
     },
@@ -63,3 +99,17 @@ export const {auth, signIn, signOut, handlers} = NextAuth({
         signIn: '/auth/signin'
     }
 })
+
+
+/**
+id: 2,
+  fname: 'Test',
+  lname: 'User',
+  email: 'test@gmail.com',
+  phone: '123456',
+  image_path: null,
+  email_verified_at: null,
+  created_at: null,
+  updated_at: null,
+  token: '13|G2xajpjrG1bh71Gu9zqB6jbFOpzmSAab2W9uv5ltea10556e'
+ */

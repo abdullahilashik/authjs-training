@@ -20,6 +20,7 @@ import AuthButton from '@/components/auth/auth-button';
 import { handleSignIn } from '@/actions/auth-action';
 import AuthErrorStatus from '@/components/auth/error-status';
 import SocialAuthContainer from '@/components/auth/social-auth-container';
+import Link from 'next/link';
 
 const SignInPage = () => {
   const [globalError, setGlobalError] = useState<string | undefined>('');
@@ -78,12 +79,12 @@ const SignInPage = () => {
                   <FormMessage />
                 </form>
               </Form>
-
+              <Link href={'/auth/forgot-password'} className='flex items-center justify-center'>Forgot password?</Link>
               <SocialAuthContainer />
             </CardContent>
             <CardFooter className='flex flex-col items-center'>
               {globalError && <AuthErrorStatus error message={globalError} />}
-              <AuthCardFooter title={`Don't have an account?`} labelHref='/auth/signup' labelText='Create an Acount' />
+              <AuthCardFooter title={`Don't have an account?`} labelHref='/auth/signup' labelText='Create an Acount' />                            
             </CardFooter>
           </Card>
         </div>
