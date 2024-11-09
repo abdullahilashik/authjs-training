@@ -5,6 +5,7 @@ import ViewCount from './view-count';
 import FavoriteCount from './favorite-count';
 import BookmarkCount from './bookmark-count';
 import Link from 'next/link';
+import DateReadable from './date-readable';
 
 interface PostProps {
     id: string;
@@ -20,7 +21,7 @@ const PostList = ({posts} : any) => {
   return (
     <div className="flex flex-col gap-y-4">
         {
-            posts.map(post=> (
+            posts && posts.map((post : PostProps)=> (
                 <Card key={post.id}>            
                     <CardContent className='flex items-start flex-col justify-center p-4 gap-y-4'>
                         <div className="flex flex-col items-start">
@@ -29,7 +30,7 @@ const PostList = ({posts} : any) => {
                             </Link>
                             <ul className="flex items-center gap-1 mt-2">
                                 {
-                                    post?.categories?.map(category=> <span key={category} className="badge px-2 py-1 rounded bg-gray-100 text-[10px]">{category}</span>)
+                                    post?.categories?.map((category : any)=> <span key={category} className="badge px-2 py-1 rounded bg-gray-100 text-[10px]">{category}</span>)
                                 }
                             </ul>
                         </div>
@@ -38,14 +39,15 @@ const PostList = ({posts} : any) => {
                                 <Image src={'https://github.com/shadcn.png'} height={40} width={40} className='rounded-full' alt="User Avatar"/>
                                 <div className="flex flex-col items-start">
                                     <h4>{post?.user?.fname}{` `} {post?.user?.lname}</h4>
-                                    <span className="text-sm">{post.created_at}</span>
+                                    {/* <span className="text-sm">{post.created_at}</span> */}
+                                    <DateReadable dateString={post.created_at}/>
                                 </div>
                             </div>
                             {/* action buttons */}
                             <div className='flex items-center gap-0'>
-                                <ViewCount />                    
-                                <FavoriteCount />
-                                <BookmarkCount />                                
+                                <ViewCount post={post} />                    
+                                <FavoriteCount post={post} />
+                                <BookmarkCount post={post} />                                
                             </div>
                         </div>
                     </CardContent>

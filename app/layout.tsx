@@ -5,6 +5,7 @@ import Navbar from '@/components/navbar/navbar';
 import {SessionProvider} from 'next-auth/react';
 import { auth } from "@/auth";
 import Header from "@/components/header/Header";
+import Script from "next/script";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -39,6 +40,7 @@ export default async function RootLayout({
         <Navbar />      
         {session && <Header />  }
         {children}
+        {/* <Script src="https://cdn.tiny.cloud/1/vkrts1fistxm6f1g7yq0ie63jxnchvrgxlv961doyktk5f4l/tinymce/7/tinymce.min.js" referrerPolicy="origin"></Script>         */}
       </body>
     </html>
     </SessionProvider>

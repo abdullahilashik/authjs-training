@@ -43,6 +43,7 @@ const Navbar = async () => {
             {
               session && (
                 <>
+                <Link className={buttonVariants({variant: 'default'})} href={'/posts/create-new'}>Create Post</Link>
                 <Popover>
                     <PopoverTrigger asChild>
                       <Bell />

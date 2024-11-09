@@ -1,3 +1,5 @@
+"use client"
+
 import { fetchPostCategoryList } from "@/actions/category-action";
 import { fetchPosts } from "@/actions/post-action";
 import BreadCrumb from "@/components/breadcrumb";
@@ -7,16 +9,33 @@ import StatsCard from "@/components/stats";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {SquarePen} from 'lucide-react';
+import React, { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from 'next/navigation';
 
 
-export default async function Home() {  
+export default function PostPage() {
+  
+  const [posts, setPosts] = useState();
+  const [categories, setCategories] = useState();
+  const searchParams = useSearchParams();
+  
+  const page = parseInt(searchParams.get("page") || '1');
+  const category = searchParams.get("category");
+  const filter = searchParams.get("filter");
 
-  // const page = 1;
-  const posts = await fetchPosts(1);
-  const categories = await fetchPostCategoryList();
+  useEffect(()=>{
+    fetchPosts(page)
+      .then(response=>{ 
+        setPosts(response);
+      })
 
-  console.log('Posts: ', posts);
+    fetchPostCategoryList()
+      .then(response=>{
+        setCategories(response);
+      });
+  }, [page, category, filter]);
     
+
   return (
     <section className="py-12">
       <div className="container mx-auto">    
@@ -36,7 +55,7 @@ export default async function Home() {
               </SelectTrigger>
               <SelectContent>
                 
-                {categories.map(category=> <SelectItem value={category.slug} key={category.id}>{category.title}</SelectItem>)}
+                {categories && categories.map(category=> <SelectItem value={category.slug} key={category.id}>{category.title}</SelectItem>)}
               </SelectContent>
             </Select>
             <Select>
@@ -52,7 +71,11 @@ export default async function Home() {
         </div>
         {/* post list */}
         <div className="py-12">
-          <PostList posts={posts.data} />
+          <React.StrictMode>
+            <Suspense fallback={<h1>Please wait...</h1>}>
+              <PostList posts={posts?.data || []} />
+            </Suspense>
+          </React.StrictMode>
         </div>
         {posts && <PostPagination links={posts.links} />}
       </div>

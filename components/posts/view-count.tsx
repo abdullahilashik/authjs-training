@@ -2,11 +2,11 @@ import React from 'react'
 import {Eye} from 'lucide-react';
 import { Button } from '../ui/button';
 
-const ViewCount = () => {
+const ViewCount = ({post}) => {
   return (
     <Button size={'sm'} variant={'link'} className='flex gap-1'>
         <Eye />
-        <span>2</span>
+        <span>{post?.view_count || 0}</span>
     </Button>
   )
 }
