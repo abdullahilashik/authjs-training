@@ -30,7 +30,7 @@ export async function postCommentAction(comment: string, token: string, post_id:
 
 export async function getCommentsPaginated(postId: number, token: string){
     try{
-        console.log('Received token: ', token);
+        
         const config = {headers: {
             'Accept': 'application/json',
             'Authorization': 'Bearer ' + token
@@ -41,9 +41,9 @@ export async function getCommentsPaginated(postId: number, token: string){
             method: 'GET',
             headers: config.headers,
             next: {
-                revalidate: 3,                
+                revalidate: 0,
             },
-            cache: 'no-store'
+            cache: 'no-cache'
         })
         return await response.json();
     }catch(error : any){
@@ -63,10 +63,10 @@ export async function postCommentReply (comment: string, comment_id: number, tok
             comment, comment_id
         };
         const response = await axios.post('http://localhost:8000/api/posts/comment/reply', payload, config);
-        console.log('Reply response: ', response.data);        
+        
         return response.data;
     }catch(error : any){
-        console.log('error: ', error);
+        
         throw new Error(error?.response?.data || 'Failed to post comment');
     }
 }

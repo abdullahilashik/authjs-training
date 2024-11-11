@@ -1,26 +1,34 @@
-import { fetchSinglePost } from '@/actions/post-action'
+import { fetchSinglePost, increaseView } from '@/actions/post-action'
+import { auth } from '@/auth'
 import BreadCrumb from '@/components/breadcrumb'
 import BookmarkCount from '@/components/posts/bookmark-count'
 import DateReadable from '@/components/posts/date-readable'
 import FavoriteCount from '@/components/posts/favorite-count'
 import PostComment from '@/components/posts/post-comment'
 import PostCommentList from '@/components/posts/post-comment-list'
-import TinyEditor from '@/components/posts/tiny-editor'
 import ViewCount from '@/components/posts/view-count'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
-import axios from 'axios'
 import { FacebookIcon, InstagramIcon, RedoDotIcon, TwitterIcon } from 'lucide-react'
+import { revalidatePath } from 'next/cache'
 import Image from 'next/image'
 import React from 'react'
-import { Controller, useForm } from 'react-hook-form'
+import { unstable_noStore as noStore } from 'next/cache';
+
+
+async function handleIncreaseView(postId, token){
+    await increaseView(postId, token); // increase the view
+    revalidatePath('/', 'layout');
+}
+
+export const dynamic = 'force-dynamic';
 
 const PostIndividualPage = async ({params}) => {
-    const slug = await params; 
-    console.log('Slug: ', slug.slug);   
+    noStore();
+    const slug = await params;     
     const post = await fetchSinglePost(slug.slug);    
-    console.log('Post: ', post);
-
+    const session = await auth();
+    const response = await increaseView(post.id, session?.user?.token); // increase the view    
     
   return (
     <section className='py-12'>

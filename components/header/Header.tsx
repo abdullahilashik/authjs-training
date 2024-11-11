@@ -34,6 +34,12 @@ const Header = () => {
         // console.log(event.target.value);
     }
 
+    const onCategoryUpdate = (event) => {
+        event.preventDefault();
+        const value = event.target.value;
+        setFilter(value);
+    };
+
     useEffect(()=> {
         const timer  = setTimeout(()=>{
             if(keyword || filter){
@@ -80,7 +86,7 @@ const Header = () => {
                 <form action={handleAutocomplete} className='bg-white w-2/4 rounded shadow p-1 flex items-center justify-between mt-5'>
                     <Search />
                     <input type="text" onChange={onKeywordUpdate} value={keyword} name='keyword' placeholder='Type for getting the data' className='p-2 flex-1 outline-none border-none' />
-                    <select name="category" id="" className='border-l-2 pl-4 border-black'>
+                    <select name="category" onChange={onCategoryUpdate} id="" className='border-l-2 pl-4 border-black'>
                         <option value="">All Categories</option>
                         {
                             categories && categories?.map(category=> <option key={category.id} value={category.slug}>{category.title}</option>)

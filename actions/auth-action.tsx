@@ -7,7 +7,7 @@ import { AuthError } from 'next-auth';
 import { SignupSchema } from '@/schemas/signup-schema';
 import axios from 'axios';
 import { ResetSchema } from '@/schemas/reset-schema';
-import { ParamProps } from '@/app/auth/reset-password/page';
+import { ParamProps } from '@/app/auth/reset-password/page2';
 
 export const handleSignIn = async({email, password} : (z.infer<typeof SignInSchema>)) => {
     try{
@@ -41,7 +41,7 @@ export const handleSignIn = async({email, password} : (z.infer<typeof SignInSche
 
 export const handleSignUp = async(values : z.infer<typeof SignupSchema>) => {
     try{
-        console.log('Server received: ', values);
+        
         const response = await axios.post('http://localhost:8000/api/register', values, {
             headers: {
                 'Accept' : 'application/json'
@@ -49,14 +49,14 @@ export const handleSignUp = async(values : z.infer<typeof SignupSchema>) => {
         });
         // await handleSignIn(values);
     }catch(error : any){
-        console.log('[server action] Handle Sign Up error: ', error?.response?.data);
+        
         return error?.response?.data;
     }
 }
 
 export const handleForgetPassword = async (values: z.infer<typeof ResetSchema>) => {
     try{
-        console.log("Forgot password received: ", values);
+        
         const response = await axios.post('http://localhost:8000/api/forgot-password', values, {
             headers: {
                 'Accept' : 'application/json'
@@ -64,7 +64,7 @@ export const handleForgetPassword = async (values: z.infer<typeof ResetSchema>) 
         });        
         return response?.data;
     }catch(error: any){
-        console.log('Error: ', error.response.data);
+        
         return error?.response?.data || 'Error sending reset link request';
     }
 }

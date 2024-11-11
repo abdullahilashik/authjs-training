@@ -34,8 +34,7 @@ export const {auth, signIn, signOut, handlers} = NextAuth({
                 };                                
 
                 // auth start
-                try {
-                    console.log('Sending for login: ', parsedCredentials)
+                try {                    
                     const res : any = await axios.post('http://localhost:8000/api/login', parsedCredentials.data, {
                         headers: {
                             'Accept': 'application/json',
