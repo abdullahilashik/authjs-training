@@ -2,15 +2,30 @@
 
 import axios from "axios";
 
-export async function fetchPosts(page : number){
+export async function fetchPosts(query){
     try{
-        const url = 'http://localhost:8000/api/posts?page=' + page;        
-        const response = await axios.get(url, {
+        const page = query?.page || 1;
+        // const url = 'http://localhost:8000/api/posts?page=' + page;
+        // const response = await axios.get(url, {
+        //     headers: {
+        //         'Accept': 'application/json'
+        //     }
+        // });
+        // return response.data;
+        const url = 'http://localhost:8000/api/posts/search';
+        // const newUrl = 'http://localhost:8000/api/posts/search?query=payg-asset-p';
+        let newUrl = new URL(url);
+        newUrl.search = new URLSearchParams(query);
+        console.log('Sending request to: ', newUrl.href);
+        const config = {
             headers: {
                 'Accept': 'application/json'
             }
-        });
+        };
+        const response = await axios.get(newUrl.href, config);
+        console.log('Resonse: ', response.data);
         return response.data;
+
     }catch(error : any){
         throw new Error(error?.response?.data || 'No post found')
     }

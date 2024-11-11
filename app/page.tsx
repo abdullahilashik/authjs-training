@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import BreadCrumb from "@/components/breadcrumb";
 import PostList from "@/components/posts/post-lists";
 import PostPagination from "@/components/posts/post-pagination";
+import PostsSearch from "@/components/posts/posts-search";
 import StatsCard from "@/components/stats";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -18,37 +19,16 @@ export const SearchSchema = z.object({
   sortType: z.string()
 })
 
-export default async function Home() {  
-  const session = await auth();
-  // const page = 1;
-  let posts = await fetchPosts(1);
-  const categories = await fetchPostCategoryList();
-
-  const handleSubmitForm = async (values) => {
-    "use server";    
-    // await fetchData(values.get('category'), values.get('sort'));
-    const payload = {
-        query: values.get('category'), 
-        filter: values.get('sort')
-      };
-      console.log('Sending in the pyaload: ', payload);
-      try{
-          const response = await axios.post('http://localhost:8000/api/posts/search', 
-            payload, 
-            {
-              headers: {
-                  'Accept': 'application.json',
-                  'Authorization': 'Bearer ' + session?.user?.token
-              }
-          });
-
-          console.log('Search Results: ', response.data);
-          // revalidatePath('/','layout');
-          posts = response.data          
-      }catch(error){
-          console.log("Failed to load data");          
-      }
-  }  
+export default async function Home({searchParams} : {
+  searchParams?: {
+    query: string, 
+    page: string
+  }
+}) {  
+  // const query = searchParams?.query || '';      
+  const query = await searchParams;  
+  const session = await auth();    
+  const categories = await fetchPostCategoryList();   
     
   return (
     <section className="py-12">
@@ -63,35 +43,15 @@ export default async function Home() {
           </Button>
           {/* filter action */}
           <div className="flex items-center gap-4">            
-            <form action={handleSubmitForm} className="inline-flex gap-2 items-center">
-              <Select name="category">
-                <SelectTrigger className="w-44">
-                  <SelectValue placeholder="All Categories" />
-                </SelectTrigger>
-                <SelectContent>                  
-                  {categories.map(category=> <SelectItem value={category.slug} key={category.id}>{category.title}</SelectItem>)}
-                </SelectContent>
-              </Select>
-              <Select name="sort">
-                <SelectTrigger className="w-44">
-                  <SelectValue placeholder="Sort By" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="newest">Newest</SelectItem>
-                  <SelectItem value="oldest">Oldest</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button type="submit">Search</Button>
-            </form>
+            <PostsSearch categories={categories} />
           </div>
         </div>
         {/* post list */}
         <div className="py-12">
           <React.Suspense>
-            <PostList posts={posts.data} />
+            <PostList query={query}/>
           </React.Suspense>
-        </div>
-        {posts && <PostPagination links={posts.links} />}
+        </div>        
       </div>
     </section>    
   );

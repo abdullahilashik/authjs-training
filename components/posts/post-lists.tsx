@@ -1,11 +1,13 @@
 import React from 'react'
-import { Card, CardContent, CardHeader } from '../ui/card'
+import { Card, CardContent } from '../ui/card'
 import Image from 'next/image'
 import ViewCount from './view-count';
 import FavoriteCount from './favorite-count';
 import BookmarkCount from './bookmark-count';
 import Link from 'next/link';
 import DateReadable from './date-readable';
+import { fetchPosts } from '@/actions/post-action';
+import PostPagination from './post-pagination';
 
 interface PostProps {
     id: string;
@@ -17,7 +19,9 @@ interface PostProps {
     categories: any
 }
 
-const PostList = ({posts} : any) => {
+const PostList = async ({query} : {query: any}) => {
+    let posts = await fetchPosts(query);
+    posts = posts.data;
   return (
     <div className="flex flex-col gap-y-4">
         {
@@ -39,8 +43,8 @@ const PostList = ({posts} : any) => {
                                 <Image src={'https://github.com/shadcn.png'} height={40} width={40} className='rounded-full' alt="User Avatar"/>
                                 <div className="flex flex-col items-start">
                                     <h4>{post?.user?.fname}{` `} {post?.user?.lname}</h4>
-                                    {/* <span className="text-sm">{post.created_at}</span> */}
-                                    <DateReadable dateString={post.created_at}/>
+                                    <span className="text-sm">{post.created_at}</span>
+                                    {/* <DateReadable dateString={post.created_at}/> */}
                                 </div>
                             </div>
                             {/* action buttons */}
@@ -54,6 +58,8 @@ const PostList = ({posts} : any) => {
                 </Card>
             ))
         }
+
+        {posts && <PostPagination links={posts.links} />}
     </div>
   )
 }
